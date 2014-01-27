@@ -26,4 +26,5 @@ def hello():
 if __name__ == '__main__':
     # Note that the websockets will not work this way!
     # Instead use: gunicorn -k flask_sockets.worker hello:app 
+    app.debug = True
     app.run()
