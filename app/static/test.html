@@ -29,6 +29,7 @@
 
         var orig;
         var teams = 1;
+        var scores = {};
 
         function to_int(value) {
             if ($.isNumeric(value))
@@ -76,12 +77,41 @@
         }
 
         function score_all_teams() {
-            for (var i = 1; i <= teams; i++)
-                $("#team" + i + " .final_score").text(calc_score("team" + i));
+            for (var i = 1; i <= teams; i++) {
+                var team = "team" + i;
+                var score = calc_score(team);
+                scores[team] = score;
+                $("#team" + i + " .final_score").text(score);
+            }
         }
 
         function rank_teams() {
-            $("#rankings").html("<strong>ranks here</strong>");
+            var html = "";
+
+            var tuples = [];
+
+            // build sortable array of tuples from the scores obj
+            for (var k in scores) tuples.push([k, scores[k]]);
+            tuples.sort(function(a, b) {
+                a = a[1];
+                b = b[1];
+
+                // reverse them for a reverse sort
+                var k = a;
+                a = b;
+                b = k;
+
+                return a < b ? -1 : (a > b ? 1 : 0); 
+            });
+
+            for (var i = 0; i < tuples.length; i++) {
+                var team = tuples[i][0];
+                var score = tuples[i][1];
+
+                var name = $("#" + team).find(".name").val();
+                html += "<li>" + name + ": " + score + "</li>";
+            }
+            $("#rankings").html(html);
         }
 
         //called on load
@@ -94,7 +124,7 @@
                 add_team();
             });
 
-            $(".score").on("blur", function(event) {
+            $(".score").change(function(event) {
                 score_all_teams();
             });
 
