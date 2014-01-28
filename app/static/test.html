@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <title>Triviapp Test 1</title>
     <style>
+        #rankings {
+            width: 600px;
+            margin-top: 10px;
+        }
+        #content, #header {
+            margin: 20px;
+        }
         .score {
             /*width: 25px;*/
             width: 100%;
@@ -86,7 +93,12 @@
         }
 
         function rank_teams() {
-            var html = "";
+            var html = "<table class=\"table table-striped\"> \
+                <tr> \
+                <th style=\"width: 25px;\">Rank</th> \
+                <th style=\"width: 300px;\">Team</th> \
+                <th style=\"width: 25px;\">Score</th> \
+                </tr>";
 
             var tuples = [];
 
@@ -96,21 +108,31 @@
                 a = a[1];
                 b = b[1];
 
-                // reverse them for a reverse sort
-                var k = a;
-                a = b;
-                b = k;
-
                 return a < b ? -1 : (a > b ? 1 : 0); 
+            }).reverse();
+
+            // magically generate rank numbers
+            // start by getting an array of just the scores
+            var scores_only = [];
+            for (var x in tuples) {
+                scores_only.push(tuples[x][1]);
+            }
+            var ranks = scores_only.slice().map(function(v) {
+                return scores_only.indexOf(v) + 1;
             });
 
-            for (var i = 0; i < tuples.length; i++) {
+            for (var i in tuples) {
                 var team = tuples[i][0];
                 var score = tuples[i][1];
+                var rank = ranks[i];
 
                 var name = $("#" + team).find(".name").val();
-                html += "<li>" + name + ": " + score + "</li>";
+                html += "<tr>";
+                html += "<td>" + rank + "</td><td>" + name + "</td><td>" + score + "</td>";
+                html += "</tr>";
+
             }
+            html += "</table>";
             $("#rankings").html(html);
         }
 
@@ -139,8 +161,10 @@
     </script>
 </head>
 <body>
-<h2>Triviapp v1</h2>
-<input id="add" type="button" value="Add Team" class="btn btn-warning" />
+<div id="header">
+    <h2>Triviapp v1</h2>
+    <input id="add" type="button" value="Add Team" class="btn btn-warning" />
+</div>
 <div id="content">
     <table id="board" class="table">
         <tr>
@@ -225,12 +249,10 @@
     
     </table>
 
-    <input id="calc" type="button" value="Calculate" class="btn btn-primary" />
 
     <h3>Rankings</h3>
+    <input id="calc" type="button" value="Calculate" class="btn btn-primary" />
     <div id="rankings">
-
-
     </div>
 </div>
 
