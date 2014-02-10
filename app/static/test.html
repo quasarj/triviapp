@@ -34,6 +34,7 @@
 
     <script type="text/javascript">
 
+        var conn;
         var orig;
         var teams = 1;
         var scores = {};
@@ -90,6 +91,7 @@
                 scores[team] = score;
                 $("#team" + i + " .final_score").text(score);
             }
+            save_state();
         }
 
         function rank_teams() {
@@ -135,6 +137,21 @@
             html += "</table>";
             $("#rankings").html(html);
         }
+        
+        function save_state() {
+            var state = {};
+
+            $(".name").each(function(i, item) {
+                var x = {};
+                var team = "team" + (i + 1);
+                x.name = $(item).val();
+                x.score = scores[team];
+                // collect all of the values for each input box here!
+                state[team] = x;
+            });
+
+            conn.send(JSON.stringify(state));
+        }
 
         //called on load
         $(function() {
@@ -155,6 +172,14 @@
             });
 
             orig = $("#team1").clone();
+
+
+            // how can we adjust this to point to the same
+            // host we're on? is there a shortcut?
+            conn = new WebSocket('ws://fink:8000/main');
+            conn.onmessage = function(e) {
+                console.log("Server response: " + e.data);
+            }
 
         });
     
